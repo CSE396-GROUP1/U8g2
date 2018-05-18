@@ -48,7 +48,11 @@ namespace BoardOperation
                     const int16_t cursorXPosition,
                     const int16_t cursorYPosition,
                     const int8_t isCursorActive);
-    void drawBoard(char board[][COL], int rowNumber, int colNumber, int startX, int startY);                
+    void drawBoard(char board[][COL], int rowNumber, int colNumber, int startX, int startY);         
+    void goUp(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell);
+    void goDown(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell);
+    void goRight(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell);
+    void goLeft(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell);     
 }
 
 namespace StateOperation

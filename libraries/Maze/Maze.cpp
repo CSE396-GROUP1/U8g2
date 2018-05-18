@@ -4,6 +4,15 @@
 #define SIZE_X 10
 #define SIZE_Y 10
 
+typedef enum DIRECTION {
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT
+};
+
+DIRECTION direction;
+
 U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, SCL, SDA, U8X8_PIN_NONE);
 static const unsigned char PROGMEM logo [] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -138,6 +147,34 @@ void BoardOperation::displayBoard(const int16_t numberOfRow,
         }  
     } while ( u8g2.nextPage() );             
     delay(1);
+}
+       
+void BoardOperation::goUp(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell)
+{
+    direction = UP;
+    if(cursorXPosition>0)
+      board[--*cursorXPosition][*cursorYPosition] = fullCell;
+}
+
+void BoardOperation::goDown(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell)
+{
+    direction = DOWN;
+    if(*cursorXPosition<SIZE_X-1)
+    board[++*cursorXPosition][*cursorYPosition] = fullCell;
+}
+
+void BoardOperation::goRight(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell)
+{
+    direction = RIGHT;
+    if(*cursorYPosition<SIZE_Y-1)
+      board[*cursorXPosition][++*cursorYPosition] = fullCell;
+}
+
+void BoardOperation::goLeft(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell)
+{
+    direction = LEFT; 
+    if(*cursorYPosition>0)
+      board[*cursorXPosition][--*cursorYPosition] = fullCell;
 }
 
 void StateOperation::changeState(const char *stateName)

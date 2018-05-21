@@ -1,10 +1,8 @@
 #include <Maze.h>
 #include <string.h>
 
-#define SIZE_X 10
-#define SIZE_Y 10
-
-typedef enum DIRECTION {
+typedef enum DIRECTION
+{
     UP,
     RIGHT,
     DOWN,
@@ -14,6 +12,7 @@ typedef enum DIRECTION {
 DIRECTION direction;
 
 U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, SCL, SDA, U8X8_PIN_NONE);
+/*
 static const unsigned char PROGMEM logo [] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00,
@@ -47,35 +46,34 @@ const uint8_t rook_bitmap[] PROGMEM = {
 0x3e, // 00111110
 0x7f // 01111111
 };
-
-void DisplaySetup::initialize(void) 
+*/
+void DisplaySetup::initialize(void)
 {
     u8g2.begin();
     u8g2.enableUTF8Print();
-    u8g2.setFont(u8g2_font_helvB12_te);   
-    u8g2.setFontMode(0);                
+    u8g2.setFont(u8g2_font_helvB12_te);
+    u8g2.setFontMode(0);
 }
 
 void DisplaySetup::splashScreen(const char *splashText)
 {
-    u8g2_uint_t offset = 128;           
-    u8g2_uint_t width;                  
-    width = u8g2.getUTF8Width(splashText);    
+    u8g2_uint_t offset = 128;
+    u8g2_uint_t width;
+    width = u8g2.getUTF8Width(splashText);
     u8g2_uint_t x;
-    
-    while (offset > 0) 
+
+    while (offset > 0)
     {
         u8g2.firstPage();
-        do 
+        do
         {
             x = offset;
-            u8g2.drawUTF8(x, 38, splashText);     
-            x += width;               
-        } while ( u8g2.nextPage() );    
-        offset-=1;                          
+            u8g2.drawUTF8(x, 38, splashText);
+            x += width;
+        } while (u8g2.nextPage());
+        offset -= 1;
         delay(1);
     }
-
 }
 
 void DisplayOperation::clearDisplay(void)
@@ -86,104 +84,178 @@ void DisplayOperation::clearDisplay(void)
 void BoardOperation::emptyRectangle(int16_t startX, int16_t startY, int16_t endX, int16_t endY)
 {
     u8g2.firstPage();
-    do 
+    do
     {
-        u8g2.drawRFrame(startX, startY, endX-startX, endY-startY, 3);                    
-    } while ( u8g2.nextPage() );             
+        u8g2.drawRFrame(startX, startY, endX - startX, endY - startY, 3);
+    } while (u8g2.nextPage());
     delay(1);
 }
 
 void BoardOperation::fullRectangle(int16_t startX, int16_t startY, int16_t endX, int16_t endY)
 {
     u8g2.firstPage();
-    do 
+    do
     {
-        u8g2.drawRBox(startX, startY, endX-startX, endY-startY, 3);                    
-    } while ( u8g2.nextPage() );             
+        u8g2.drawRBox(startX, startY, endX - startX, endY - startY, 3);
+    } while (u8g2.nextPage());
     delay(1);
 }
 
-void BoardOperation::displayBoard(const int16_t numberOfRow, 
-                    const int16_t numberOfColumn,
-                    const char board[][COL], 
-                    const char fullCell,
-                    const int16_t cursorXPosition,
-                    const int16_t cursorYPosition,
-                    const int8_t isCursorActive)
+void BoardOperation::displayBoard(
+    const char board[][COL],
+    const int16_t cursorXPosition,
+    const int16_t cursorYPosition,
+    const int8_t isCursorActive)
 {
-    int16_t rowHeight = HEIGHT / numberOfRow;
-    int16_t columnWidth = WIDTH / numberOfColumn;
-    int16_t rowSpacing = HEIGHT - rowHeight * numberOfRow;
-    int16_t colSpacing = WIDTH - columnWidth * numberOfColumn;
+    int16_t rowHeight = HEIGHT / ROW;
+    int16_t columnWidth = WIDTH / COL;
+    int16_t rowSpacing = HEIGHT - rowHeight * ROW;
+    int16_t colSpacing = WIDTH - columnWidth * COL;
     int16_t rowSpacingMargin = rowSpacing / 2;
     int16_t colSpacingMargin = colSpacing / 2;
 
     u8g2.firstPage();
-    do 
+    do
     {
-        for(int i=0; i<numberOfRow; ++i) {
-            for(int j=0; j<numberOfColumn; ++j) {
-                if(isCursorActive && i==cursorXPosition && j==cursorYPosition) {
-                    u8g2.drawRBox(colSpacingMargin + j*columnWidth, 
-                                rowSpacingMargin + i*rowHeight, 
-                                columnWidth, 
-                                rowHeight, 
-                                0);
+        for (int i = 0; i < ROW; ++i)
+        {
+            for (int j = 0; j < COL; ++j)
+            {
+                if (isCursorActive)
+                {
+                    if (board[i][j] == FULL_CELL)
+                    {
+                        u8g2.drawRBox(colSpacingMargin + j * columnWidth,
+                                      rowSpacingMargin + i * rowHeight,
+                                      columnWidth,
+                                      rowHeight,
+                                      1);
+                    }
+                    else
+                    {
+                        u8g2.drawRFrame(colSpacingMargin + j * columnWidth,
+                                        rowSpacingMargin + i * rowHeight,
+                                        columnWidth,
+                                        rowHeight,
+                                        1);
+                    }
                 }
-                if (board[i][j] == fullCell) {
-                    u8g2.drawRBox(colSpacingMargin + j*columnWidth, 
-                                rowSpacingMargin + i*rowHeight, 
-                                columnWidth, 
-                                rowHeight, 
-                                0);
-                } else {
-                    u8g2.drawRFrame(colSpacingMargin + j*columnWidth, 
-                                rowSpacingMargin + i*rowHeight, 
-                                columnWidth, 
-                                rowHeight, 
-                                0);
+                else
+                {
+                    if (i != cursorXPosition || j != cursorYPosition)
+                    {
+                        if (board[i][j] == FULL_CELL)
+                        {
+                            u8g2.drawRBox(colSpacingMargin + j * columnWidth,
+                                          rowSpacingMargin + i * rowHeight,
+                                          columnWidth,
+                                          rowHeight,
+                                          1);
+                        }
+                        else
+                        {
+                            u8g2.drawRFrame(colSpacingMargin + j * columnWidth,
+                                            rowSpacingMargin + i * rowHeight,
+                                            columnWidth,
+                                            rowHeight,
+                                            1);
+                        }
+                    }
+                    else
+                    {
+                        u8g2.drawRFrame(colSpacingMargin + j * columnWidth,
+                                        rowSpacingMargin + i * rowHeight,
+                                        columnWidth,
+                                        rowHeight,
+                                        1);
+                    }
                 }
             }
-        }  
-    } while ( u8g2.nextPage() );             
+        }
+    } while (u8g2.nextPage());
     delay(1);
 }
-       
-void BoardOperation::goUp(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell)
+
+void BoardOperation::goUp(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition)
 {
     direction = UP;
-    if(cursorXPosition>0)
-      board[--*cursorXPosition][*cursorYPosition] = fullCell;
+    if (*cursorXPosition == 10)
+    {
+        board[--*cursorXPosition][*cursorYPosition] = FULL_CELL;
+    }
+    else if (*cursorXPosition > 0)
+    {
+        board[--*cursorXPosition][*cursorYPosition] = FULL_CELL;
+    }
 }
 
-void BoardOperation::goDown(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell)
+void BoardOperation::goDown(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition)
 {
     direction = DOWN;
-    if(*cursorXPosition<SIZE_X-1)
-    board[++*cursorXPosition][*cursorYPosition] = fullCell;
+    if (*cursorXPosition != 10 && *cursorXPosition < ROW - 1)
+    {
+        board[++*cursorXPosition][*cursorYPosition] = FULL_CELL;
+    }
 }
 
-void BoardOperation::goRight(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell)
+void BoardOperation::goRight(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition)
 {
     direction = RIGHT;
-    if(*cursorYPosition<SIZE_Y-1)
-      board[*cursorXPosition][++*cursorYPosition] = fullCell;
+    if (*cursorXPosition == 10)
+    {
+        board[*cursorXPosition][*cursorYPosition] = EMPTY_CELL;
+        board[*cursorXPosition][++*cursorYPosition] = FULL_CELL;
+    }
+    else if (*cursorYPosition < COL - 1)
+    {
+        board[*cursorXPosition][++*cursorYPosition] = FULL_CELL;
+    }
 }
 
-void BoardOperation::goLeft(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell)
+void BoardOperation::goLeft(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition)
 {
-    direction = LEFT; 
-    if(*cursorYPosition>0)
-      board[*cursorXPosition][--*cursorYPosition] = fullCell;
+    direction = LEFT;
+    if (*cursorXPosition == 10)
+    {
+        board[*cursorXPosition][*cursorYPosition] = EMPTY_CELL;
+        board[*cursorXPosition][--*cursorYPosition] = FULL_CELL;
+    }
+    else if (*cursorYPosition > 0)
+    {
+        board[*cursorXPosition][--*cursorYPosition] = FULL_CELL;
+    }
+}
+
+void BoardOperation::initializeBoard(char board[][COL])
+{
+    for (int i = 0; i < ROW; ++i)
+    {
+        for (int j = 0; j < COL; ++j)
+        {
+            board[i][j] = EMPTY_CELL;
+        }
+    }
+}
+
+void BoardOperation::changeCursorState(int8_t *isCursorActive)
+{
+    if (*isCursorActive)
+    {
+        *isCursorActive = 0;
+    }
+    else
+    {
+        *isCursorActive = 1;
+    }
 }
 
 void StateOperation::changeState(const char *stateName)
 {
     u8g2.firstPage();
-    do 
+    do
     {
-        u8g2.drawUTF8((128-u8g2.getUTF8Width(stateName))/2, 38, stateName);   
-    } while ( u8g2.nextPage() );             
+        u8g2.drawUTF8((128 - u8g2.getUTF8Width(stateName)) / 2, 38, stateName);
+    } while (u8g2.nextPage());
     delay(1000);
 }
 
@@ -228,7 +300,7 @@ void StateOperation::load(void)
     delay(170);
 }
 
-void StateOperation::unload(void) 
+void StateOperation::unload(void)
 {
     u8g2.drawPixel(64, 20);
     u8g2.display();
@@ -272,32 +344,24 @@ void StateOperation::unload(void)
 void Test::drawBoardTest(void)
 {
     int loopCounter = 0;
-    int isCursorActive = 0;
+    uint8_t isCursorActive = 0;
     int isSplashShown = 0;
     int x = 0;
     int y = 0;
     char board[10][10];
 
-    for (int i=0; i<10; ++i)
+    for (int i = 0; i < 10; ++i)
     {
-        for (int j=0; j<10; ++j) 
+        for (int j = 0; j < 10; ++j)
         {
-            board[i][j] = 'O';
+            board[i][j] = EMPTY_CELL;
         }
     }
 
     while (1)
     {
-        board[x][y] = 'X';
-        BoardOperation::displayBoard(SIZE_X, SIZE_Y, board, 'X', x, y, isCursorActive);
-        if (isCursorActive)
-        {
-            isCursorActive = 0;
-        }
-        else
-        {
-            isCursorActive = 1;
-        }
+        board[x][y] = FULL_CELL;
+        BoardOperation::displayBoard(board, x, y, isCursorActive);
 
         delay(10);
 
@@ -305,15 +369,8 @@ void Test::drawBoardTest(void)
         {
             for (int i = 0; i < 10; ++i)
             {
-                BoardOperation::displayBoard(10, 10, board, 'X', 0, 0, isCursorActive);
-                if (isCursorActive)
-                {
-                    isCursorActive = 0;
-                }
-                else
-                {
-                    isCursorActive = 1;
-                }
+                BoardOperation::displayBoard(board, 0, 0, isCursorActive);
+                BoardOperation::changeCursorState(&isCursorActive);
                 delay(10);
             }
         }
@@ -321,98 +378,56 @@ void Test::drawBoardTest(void)
         switch (loopCounter)
         {
         case 1:
-            board[0][0] = 'X';
+            board[0][0] = FULL_CELL;
             for (int i = 0; i < 10; ++i)
             {
-                BoardOperation::displayBoard(10, 10, board, 'X', 0, 1, isCursorActive);
-                if (isCursorActive)
-                {
-                    isCursorActive = 0;
-                }
-                else
-                {
-                    isCursorActive = 1;
-                }
+                BoardOperation::displayBoard(board, 0, 1, isCursorActive);
+                BoardOperation::changeCursorState(&isCursorActive);
                 delay(10);
             }
             break;
         case 2:
-            board[0][1] = 'X';
+            board[0][1] = FULL_CELL;
             for (int i = 0; i < 10; ++i)
             {
-                BoardOperation::displayBoard(10, 10, board, 'X', 1, 1, isCursorActive);
-                if (isCursorActive)
-                {
-                    isCursorActive = 0;
-                }
-                else
-                {
-                    isCursorActive = 1;
-                }
+                BoardOperation::displayBoard(board, 1, 1, isCursorActive);
+                BoardOperation::changeCursorState(&isCursorActive);
                 delay(10);
             }
             break;
         case 3:
-            board[1][1] = 'X';
+            board[1][1] = FULL_CELL;
             for (int i = 0; i < 10; ++i)
             {
-                BoardOperation::displayBoard(10, 10, board, 'X', 1, 2, isCursorActive);
-                if (isCursorActive)
-                {
-                    isCursorActive = 0;
-                }
-                else
-                {
-                    isCursorActive = 1;
-                }
+                BoardOperation::displayBoard(board, 1, 2, isCursorActive);
+                BoardOperation::changeCursorState(&isCursorActive);
                 delay(10);
             }
             break;
         case 4:
-            board[1][2] = 'X';
+            board[1][2] = FULL_CELL;
             for (int i = 0; i < 10; ++i)
             {
-                BoardOperation::displayBoard(10, 10, board, 'X', 2, 2, isCursorActive);
-                if (isCursorActive)
-                {
-                    isCursorActive = 0;
-                }
-                else
-                {
-                    isCursorActive = 1;
-                }
+                BoardOperation::displayBoard(board, 2, 2, isCursorActive);
+                BoardOperation::changeCursorState(&isCursorActive);
                 delay(10);
             }
             break;
-        case  5:
-            board[2][2] = 'X';
+        case 5:
+            board[2][2] = FULL_CELL;
             for (int i = 0; i < 10; ++i)
             {
-                BoardOperation::displayBoard(10, 10, board, 'X', 2, 3, isCursorActive);
-                if (isCursorActive)
-                {
-                    isCursorActive = 0;
-                }
-                else
-                {
-                    isCursorActive = 1;
-                }
+                BoardOperation::displayBoard(board, 2, 3, isCursorActive);
+                BoardOperation::changeCursorState(&isCursorActive);
                 delay(10);
             }
             break;
         case 6:
-            board[2][3] = 'X';
+            board[2][3] = FULL_CELL;
             for (int i = 0; i < 10; ++i)
             {
-                BoardOperation::displayBoard(10, 10, board, 'X', 3, 3, isCursorActive);
-                if (isCursorActive)
-                {
-                    isCursorActive = 0;
-                }
-                else
-                {
-                    isCursorActive = 1;
-                }
+                BoardOperation::displayBoard(board, 3, 3, isCursorActive);
+                BoardOperation::changeCursorState(&isCursorActive);
                 delay(10);
             }
             break;
@@ -422,15 +437,8 @@ void Test::drawBoardTest(void)
         {
             for (int i = 0; i < 10; ++i)
             {
-                BoardOperation::displayBoard(10, 10, board, 'X', 3, 3, isCursorActive);
-                if (isCursorActive)
-                {
-                    isCursorActive = 0;
-                }
-                else
-                {
-                    isCursorActive = 1;
-                }
+                BoardOperation::displayBoard(board, 3, 3, isCursorActive);
+                BoardOperation::changeCursorState(&isCursorActive);
                 delay(10);
             }
         }
@@ -444,9 +452,9 @@ void Test::runTests(void)
 {
     DisplaySetup::splashScreen("Maze Game");
     delay(1000);
-    BoardOperation::emptyRectangle(20,15,50,37);
+    BoardOperation::emptyRectangle(20, 15, 50, 37);
     delay(1000);
-    BoardOperation::fullRectangle(20,15,50,37);
+    BoardOperation::fullRectangle(20, 15, 50, 37);
     delay(1000);
     StateOperation::changeState("Loading");
     delay(1000);

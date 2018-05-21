@@ -6,8 +6,10 @@
 #pragma region DEFINITONS
 #define WIDTH 128
 #define HEIGHT 64
-#define ROW 10
+#define ROW 11
 #define COL 10
+#define FULL_CELL 'X'
+#define EMPTY_CELL 'O'
 
 typedef enum STATE 
 {
@@ -41,18 +43,18 @@ namespace BoardOperation
 {
     void emptyRectangle(int16_t startX, int16_t startY, int16_t endX, int16_t endY);
     void fullRectangle(int16_t startX, int16_t startY, int16_t endX, int16_t endY);
-    void displayBoard(const int16_t numberOfRow, 
-                    const int16_t numberOfColumn,
-                    const char board[][COL], 
-                    const char fullCell,
+    void displayBoard(
+                    const char board[][COL],
                     const int16_t cursorXPosition,
                     const int16_t cursorYPosition,
                     const int8_t isCursorActive);
     void drawBoard(char board[][COL], int rowNumber, int colNumber, int startX, int startY);         
-    void goUp(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell);
-    void goDown(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell);
-    void goRight(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell);
-    void goLeft(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition, const char fullCell);     
+    void goUp(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition);
+    void goDown(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition);
+    void goRight(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition);
+    void goLeft(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition);
+    void initializeBoard(char board[][COL]);  
+    void changeCursorState(int8_t *isCursorActive); 
 }
 
 namespace StateOperation

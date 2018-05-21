@@ -6,7 +6,7 @@
 #pragma region DEFINITONS
 #define WIDTH 128
 #define HEIGHT 64
-#define ROW 11
+#define ROW 12
 #define COL 10
 #define FULL_CELL 'X'
 #define EMPTY_CELL 'O'

@@ -178,9 +178,15 @@ void BoardOperation::displayBoard(
 
 void BoardOperation::goUp(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition)
 {
+	if(!(*cursorXPosition >= 0 && *cursorXPosition <= ROW - 1))
+		return 0;
+
     direction = UP;
-    if (*cursorXPosition == 10)
+
+
+    if (*cursorXPosition == ROW - 1)
     {
+		board[*cursorXPosition][*cursorYPosition] = EMPTY_CELL;
         board[--*cursorXPosition][*cursorYPosition] = FULL_CELL;
     }
     else if (*cursorXPosition > 0)
@@ -191,8 +197,11 @@ void BoardOperation::goUp(char board[][COL], int16_t *cursorXPosition, int16_t *
 
 void BoardOperation::goDown(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition)
 {
+	if(!(*cursorXPosition >= 0 && *cursorXPosition <= ROW))
+		return 0;
+
     direction = DOWN;
-    if (*cursorXPosition != 10 && *cursorXPosition < ROW - 1)
+    if (*cursorXPosition < ROW - 1)
     {
         board[++*cursorXPosition][*cursorYPosition] = FULL_CELL;
     }
@@ -200,8 +209,11 @@ void BoardOperation::goDown(char board[][COL], int16_t *cursorXPosition, int16_t
 
 void BoardOperation::goRight(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition)
 {
+	if(!(*cursorYPosition < COL - 1))
+		return 0;
+
     direction = RIGHT;
-    if (*cursorXPosition == 10)
+    if (*cursorXPosition == ROW - 1)
     {
         board[*cursorXPosition][*cursorYPosition] = EMPTY_CELL;
         board[*cursorXPosition][++*cursorYPosition] = FULL_CELL;
@@ -214,8 +226,11 @@ void BoardOperation::goRight(char board[][COL], int16_t *cursorXPosition, int16_
 
 void BoardOperation::goLeft(char board[][COL], int16_t *cursorXPosition, int16_t *cursorYPosition)
 {
+	if(!(*cursorYPosition > 0))
+		return 0;
+
     direction = LEFT;
-    if (*cursorXPosition == 10)
+    if (*cursorXPosition == ROW - 1)
     {
         board[*cursorXPosition][*cursorYPosition] = EMPTY_CELL;
         board[*cursorXPosition][--*cursorYPosition] = FULL_CELL;
@@ -235,6 +250,7 @@ void BoardOperation::initializeBoard(char board[][COL])
             board[i][j] = EMPTY_CELL;
         }
     }
+	board[ROW-1][0] = FULL_CELL;
 }
 
 void BoardOperation::changeCursorState(int8_t *isCursorActive)
